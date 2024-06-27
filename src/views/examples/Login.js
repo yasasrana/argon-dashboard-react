@@ -1,21 +1,9 @@
-/*!
 
-=========================================================
-* Argon Dashboard React - v1.2.4
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/argon-dashboard-react
-* Copyright 2024 Creative Tim (https://www.creative-tim.com)
-* Licensed under MIT (https://github.com/creativetimofficial/argon-dashboard-react/blob/master/LICENSE.md)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
-
+import useAuth from '../../hooks/useAuth';
+import { Link,useNavigate} from 'react-router-dom';
+import React ,{useRef,Section,useState,useEffect}from 'react'
+import axios from '../../api/axios';
+import { toast } from 'react-toastify';
 // reactstrap components
 import {
   Button,
@@ -33,56 +21,78 @@ import {
 } from "reactstrap";
 
 const Login = () => {
+
+  const { setAuth } = useAuth();
+  const navigate = useNavigate();
+
+  const userRef =useRef('');
+  const errRef = useRef();
+
+  const [user,setUser] =useState('');
+  const [pwd,setPwd] =useState('');
+  const [errMsg,setErrMsg] =useState('');
+  const LOGIN_URL = '/api/users/login';
+  const from = "/admin"
+
+/*   useEffect(()=> {
+    userRef.current.focus();
+  },[]) */
+
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+   
+    try {
+      const response = await axios.post(LOGIN_URL,
+          JSON.stringify({ email:user,password:pwd }),
+          {
+              headers: { 'Content-Type': 'application/json' }
+             // withCredentials: true
+          }
+      );
+
+     const accessToken=(response?.data?.accessToken);
+     const newUser=(response?.data?.userinfo);
+
+      localStorage.setItem('user',JSON.stringify({user,newUser,accessToken}))
+      console.log(JSON.stringify({ user,newUser,accessToken}))
+      const userData = { user, newUser, accessToken };
+      setAuth(userData);
+
+     toast.info('Login Successful');
+     navigate(from);
+     
+
+  } catch (err) {
+      if (!(err?.response)) {
+        console.log(err)
+          setErrMsg('No Server Response');
+          toast.error('No Server Response',err);
+      } else if (err.response?.status === 400) {
+          setErrMsg('Missing Username or Password');
+          toast.error('Missing Username or Password',err);
+      } else if (err.response?.status === 401) {
+          setErrMsg('Unauthorized');
+          toast.error('Unauthorized',err);
+      } else {
+          setErrMsg('Login Failed');
+          toast.error('Login Failed',err);
+      }
+      
+  }
+
+  }
+
   return (
     <>
       <Col lg="5" md="7">
         <Card className="bg-secondary shadow border-0">
-          <CardHeader className="bg-transparent pb-5">
-            <div className="text-muted text-center mt-2 mb-3">
-              <small>Sign in with</small>
-            </div>
-            <div className="btn-wrapper text-center">
-              <Button
-                className="btn-neutral btn-icon"
-                color="default"
-                href="#pablo"
-                onClick={(e) => e.preventDefault()}
-              >
-                <span className="btn-inner--icon">
-                  <img
-                    alt="..."
-                    src={
-                      require("../../assets/img/icons/common/github.svg")
-                        .default
-                    }
-                  />
-                </span>
-                <span className="btn-inner--text">Github</span>
-              </Button>
-              <Button
-                className="btn-neutral btn-icon"
-                color="default"
-                href="#pablo"
-                onClick={(e) => e.preventDefault()}
-              >
-                <span className="btn-inner--icon">
-                  <img
-                    alt="..."
-                    src={
-                      require("../../assets/img/icons/common/google.svg")
-                        .default
-                    }
-                  />
-                </span>
-                <span className="btn-inner--text">Google</span>
-              </Button>
-            </div>
-          </CardHeader>
+         
           <CardBody className="px-lg-5 py-lg-5">
             <div className="text-center text-muted mb-4">
-              <small>Or sign in with credentials</small>
+              <small>Sign in with your credentials</small>
             </div>
-            <Form role="form">
+            <form onSubmit={handleSubmit}>
               <FormGroup className="mb-3">
                 <InputGroup className="input-group-alternative">
                   <InputGroupAddon addonType="prepend">
@@ -94,6 +104,9 @@ const Login = () => {
                     placeholder="Email"
                     type="email"
                     autoComplete="new-email"
+                    onChange={(e) => setUser(e.target.value)}
+                    value={user}
+                    required
                   />
                 </InputGroup>
               </FormGroup>
@@ -107,6 +120,9 @@ const Login = () => {
                   <Input
                     placeholder="Password"
                     type="password"
+                    onChange={(e) => setPwd(e.target.value)}
+                    value={pwd}
+                    required
                     autoComplete="new-password"
                   />
                 </InputGroup>
@@ -125,18 +141,18 @@ const Login = () => {
                 </label>
               </div>
               <div className="text-center">
-                <Button className="my-4" color="primary" type="button">
+                <Button className="my-4" color="primary" type="submit">
                   Sign in
                 </Button>
               </div>
-            </Form>
+            </form>
           </CardBody>
         </Card>
         <Row className="mt-3">
           <Col xs="6">
             <a
               className="text-light"
-              href="#pablo"
+              href="/"
               onClick={(e) => e.preventDefault()}
             >
               <small>Forgot password?</small>
@@ -145,7 +161,7 @@ const Login = () => {
           <Col className="text-right" xs="6">
             <a
               className="text-light"
-              href="#pablo"
+              href="/auth/register"
               onClick={(e) => e.preventDefault()}
             >
               <small>Create new account</small>

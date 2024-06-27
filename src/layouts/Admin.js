@@ -23,7 +23,8 @@ import { Container } from "reactstrap";
 import AdminNavbar from "components/Navbars/AdminNavbar.js";
 import AdminFooter from "components/Footers/AdminFooter.js";
 import Sidebar from "components/Sidebar/Sidebar.js";
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import routes from "routes.js";
 
 const Admin = (props) => {
@@ -84,6 +85,7 @@ const Admin = (props) => {
           <AdminFooter />
         </Container>
       </div>
+      <ToastContainer />
     </>
   );
 };
