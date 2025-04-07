@@ -1,9 +1,7 @@
 
 import { useState } from "react";
 // react component that copies the given text inside your clipboard
-import { CopyToClipboard } from "react-copy-to-clipboard";
 import axios from '../../api/axios';
-import { Alert } from "reactstrap";
 import '../../assets/css/argon-dashboard.css'
 import { toast } from 'react-toastify';
 // reactstrap components
@@ -13,18 +11,11 @@ import {
   CardBody,
   Container,
   Row,
-  Col,
   Button,
-  UncontrolledTooltip,
   Input,
   Modal,
-  Form,
   FormGroup,
-  InputGroup,
-  InputGroupAddon,
-  InputGroupText,
-  Badge
-} from "reactstrap";
+  InputGroup} from "reactstrap";
 // core components
 import Header from "components/Headers/Header.js";
 import { axiosPrivate } from "../../api/axios";
@@ -36,6 +27,7 @@ const Icons = () => {
   const [filx, setFilx] = useState(null);
   const [info, setInfo] = useState(null);
   const [predict, setPredict] = useState('');
+  const [tumor, setTumor] = useState('');
   const [probability, setProbability] = useState('');
   const [pid, setPid] = useState('');
   const [note, setNote] = useState('');
@@ -61,6 +53,7 @@ const Icons = () => {
           });
           setInfo(response?.data);
           setPredict(response?.data?.prediction ? 'cancerous' : 'noncanceros');
+          setTumor(response?.data?.prediction ? 'malignant' : 'benign');
           setProbability(response?.data?.probability);
           console.log('predict', predict)
           console.log('probability', probability)
@@ -151,6 +144,9 @@ const Icons = () => {
                         <img src={image} alt="Uploaded" style={{ width: '500px', height: 'auto' }} />
                       </div>
                       <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                      <div style={{ fontSize: '24px', fontWeight: 'bold', color: predict === 'cancerous' ? 'red' : 'green' }}>
+                        {tumor}
+                        </div>
                         <div style={{ fontSize: '24px', fontWeight: 'bold', color: predict === 'cancerous' ? 'red' : 'green' }}>
                           Prediction: {predict}
                         </div>

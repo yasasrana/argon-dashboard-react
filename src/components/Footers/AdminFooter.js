@@ -27,7 +27,7 @@ const Footer = () => {
                 rel="noopener noreferrer"
                 target="_blank"
               >
-                Developed by Yasas Ranathunga
+                Developed by Kalani Kapuduwa
               </NavLink>
             </NavItem>
 
